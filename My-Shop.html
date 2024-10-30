@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ecommers</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        #cart-items {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 20px;
+            display: none;
+            z-index: 20;
+            width: 300px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+        }
+
+        #overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 10;
+        }
+    </style>
+</head>
+
+<body>
+
+    <header>
+        <nav class="flex justify-between p-3 bg-sky-600">
+            <h3 class="text-white text-lg font-bold">My Shop</h3>
+            <button id="cart-button"
+                class="bg-white text-sky-600 pl-[14px] pr-[16px] font-semibold text-sm rounded-xl">Cart(0)</button>
+        </nav>
+    </header>
+
+    <main>
+        <div id="overlay"></div>
+        <div class="container md:max-w-lg grid grid-cols-3 justify-center m-auto mt-5 gap-4 relative">
+            <!-- Product Cards -->
+            <div class="shadow-sm shadow-gray-500 rounded-lg">
+                <img class="product-image h-auto w-auto object-cover p-3" src="photo-6.avif" style="visibility: hidden">
+                <div class="p-3">
+                    <h3 class="text-sm font-bold">Product 1</h3>
+                    <p class="text-[10px] font-light">$100.99</p>
+                    <button
+                        class="add-to-cart bg-sky-600 text-white text-xs rounded-sm text-[13px] font-normal p-[4px] mt-4">Add
+                        to
+                        Cart</button>
+                </div>
+            </div>
+            <!-- Repeat similar blocks for more products -->
+            <div class="shadow-sm shadow-gray-500 rounded-lg">
+                <img class="product-image h-auto w-auto object-cover p-3" src="photo-1.avif" style="visibility: hidden">
+                <div class="p-3">
+                    <h3 class="text-sm font-bold">Product 2</h3>
+                    <p class="text-[10px] font-light">$200.99</p>
+                    <button
+                        class="add-to-cart bg-sky-600 text-white text-xs rounded-sm text-[13px] font-normal p-[4px] mt-4">Add
+                        to
+                        Cart</button>
+                </div>
+            </div>
+            <div class="shadow-sm shadow-gray-500 rounded-lg">
+                <img class="product-image h-auto w-auto object-cover p-3" src="photo-6.avif" style="visibility: hidden">
+                <div class="p-3">
+                    <h3 class="text-sm font-bold">Product 3</h3>
+                    <p class="text-[10px] font-light">$300.99</p>
+                    <button
+                        class="add-to-cart bg-sky-600 text-white text-xs rounded-sm text-[13px] font-normal p-[4px] mt-4">Add
+                        to
+                        Cart</button>
+                </div>
+            </div>
+            <div class="shadow-sm shadow-gray-500 rounded-lg">
+                <img class="product-image h-auto w-auto object-cover p-3" src="photo-6.avif" style="visibility: hidden">
+                <div class="p-3">
+                    <h3 class="text-sm font-bold">Product 4</h3>
+                    <p class="text-[10px] font-light">$300.99</p>
+                    <button
+                        class="add-to-cart bg-sky-600 text-white text-xs rounded-sm text-[13px] font-normal p-[4px] mt-4">Add
+                        to
+                        Cart</button>
+                </div>
+            </div>
+            <div class="shadow-sm shadow-gray-500 rounded-lg">
+                <img class="product-image h-auto w-auto object-cover p-3" src="photo-5.avif" style="visibility: hidden">
+                <div class="p-3">
+                    <h3 class="text-sm font-bold">Product 5</h3>
+                    <p class="text-[10px] font-light">$300.99</p>
+                    <button
+                        class="add-to-cart bg-sky-600 text-white text-xs rounded-sm text-[13px] font-normal p-[4px] mt-4">Add
+                        to
+                        Cart</button>
+                </div>
+            </div>
+            <div class="shadow-sm shadow-gray-500 rounded-lg">
+                <img class="product-image h-auto w-auto object-cover p-3" src="photo-6.avif" style="visibility: hidden">
+                <div class="p-3">
+                    <h3 class="text-sm font-bold">Product 6</h3>
+                    <p class="text-[10px] font-light">$300.99</p>
+                    <button
+                        class="add-to-cart bg-sky-600 text-white text-xs rounded-sm text-[13px] font-normal p-[4px] mt-4">Add
+                        to
+                        Cart</button>
+                </div>
+            </div>
+
+
+            <div id="cart-items" class="shadow-lg rounded-sm">
+                <h4>Your Cart</h4>
+                <ul id="cart-list"></ul>
+                <p id="total-price">Total Price: $0.00</p>
+                <button class="bg-sky-600 text-white p-1 rounded-sm text-sm mt-2">Close</button>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        const buttons = document.querySelectorAll('.add-to-cart');
+        const cartButton = document.getElementById('cart-button');
+        const cartItemsDiv = document.getElementById('cart-items');
+        const cartList = document.getElementById('cart-list');
+        const totalPriceElement = document.getElementById('total-price');
+        const overlay = document.getElementById('overlay');
+
+        let cartCount = 0;
+        let cartItems = [];
+        let totalPrice = 0;
+
+        buttons.forEach(button => {
+            button.addEventListener('click', function () {
+                const productCard = this.closest('.shadow-sm');
+                const img = productCard.querySelector('.product-image');
+                const productName = productCard.querySelector('h3').textContent;
+                const productPrice = parseFloat(productCard.querySelector('p').textContent.replace('$', ''));
+
+                if (img.style.visibility === 'hidden') {
+                    img.style.visibility = 'visible';
+                    cartCount++;
+                    cartItems.push({ name: productName, price: productPrice });
+                    totalPrice += productPrice;
+                    cartButton.textContent = `Cart(${cartCount})`;
+                } else {
+                    img.style.visibility = 'hidden';
+                    cartCount--;
+                    cartItems = cartItems.filter(item => item.name !== productName);
+                    totalPrice -= productPrice;
+                    cartButton.textContent = `Cart(${cartCount})`;
+                }
+            });
+        });
+
+        cartButton.addEventListener('click', function () {
+            if (cartItemsDiv.style.display === 'none' || cartItemsDiv.style.display === '') {
+                cartItemsDiv.style.display = 'block';
+                overlay.style.display = 'block'; // Show overlay
+                // Clear previous items in the cart
+                cartList.innerHTML = '';
+                cartItems.forEach(item => {
+                    const listItem = document.createElement('li');
+                    listItem.textContent = `${item.name} - $${item.price.toFixed(2)}`;
+                    cartList.appendChild(listItem);
+                });
+                totalPriceElement.textContent = `Total Price: $${totalPrice.toFixed(2)}`;
+
+                // Hide product images when cart is open
+                buttons.forEach(button => {
+                    const productCard = button.closest('.shadow-sm');
+                    productCard.querySelector('.product-image').style.visibility = 'hidden';
+                });
+            } else {
+                cartItemsDiv.style.display = 'none';
+                overlay.style.display = 'none'; // Hide overlay
+            }
+        });
+
+        // Close button functionality
+        const closeButton = cartItemsDiv.querySelector('button');
+        closeButton.addEventListener('click', function () {
+            cartItemsDiv.style.display = 'none';
+            overlay.style.display = 'none'; // Hide overlay
+            // Clear the cart
+            cartCount = 0;
+            cartItems = [];
+            totalPrice = 0;
+            cartButton.textContent = `Cart(${cartCount})`;
+            cartList.innerHTML = '';
+            totalPriceElement.textContent = `Total Price: $0.00`;
+        });
+    </script>
+
+</body>
+
+</html>
